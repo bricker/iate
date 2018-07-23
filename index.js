@@ -31,18 +31,18 @@ const writeEntry = (text) => {
   const data = { [fields[0]]: Date.now(), [fields[1]]: text.join(' ') };
 
   fs.stat(filename, function (err, stat) {
-    if (!err) {
+    if (err || stat.size === 0) {
       const csvEntry = json2csv([data]) + newline;
-      fs.appendFile(filename, csvEntry, _ack);
-    } else {
-      const csvEntry = json2csv([data], { fields }) + newline;
       fs.writeFile(filename, csvEntry, _ack);
+    } else {
+      const csvEntry = json2csv([data], { header: false }) + newline;
+      fs.appendFile(filename, csvEntry, _ack);
     }
   });
 };
 
 const clearLog = () => {
-  fs.truncate(filename, 0, function() {
+  fs.unlink(filename, function() {
     console.log("I've cleared the log, thank you.");
   });
 };
