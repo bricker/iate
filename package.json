@@ -1,0 +1,26 @@
+{
+  "name": "iate",
+  "version": "1.0.0",
+  "description": "CLI to record your eating habits",
+  "main": "index.js",
+  "bin": {
+    "iate": "./index.js"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bricker/iate.git"
+  },
+  "keywords": [
+    "cli"
+  ],
+  "author": "Bryan Ricker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bricker/iate/issues"
+  },
+  "homepage": "https://github.com/bricker/iate#readme",
+  "dependencies": {
+    "json2csv": "^4.1.6"
+  }
+}
