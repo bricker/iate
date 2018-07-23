@@ -13,8 +13,8 @@ npm install -g iate
 iate "An entire pizza."
 ```
 
-To view the log: `iate what`
-To reset the log: `iate clear`
-To read the help message: `iate help`
+* To view the log: `iate what`
+* To reset the log: `iate clear`
+* To read the help message: `iate help`
 
 The log is saved and printed as a CSV, you can do whatever you want with it.
