@@ -1,41 +1,97 @@
 #!/usr/bin/env node
 
-const json2csv = require('json2csv').parse;
+const csv = require('papaparse');
 const fs = require('fs');
+const chrono = require('chrono-node');
 
 const newline = "\r\n";
 const filename = __dirname + '/iate.csv';
 const [,, ...command] = process.argv;
-var fields = ['Timestamp', 'Description'];
 
 const printHelp = () => {
   console.log("iate is a command line tool to help you track your eating habits.");
   console.log("Usage: iate \"An entire pizza.\"");
-  console.log("To view the log: iate what");
+  console.log("To add an entry for a specific time: iate a pint of ice cream at 10am");
+  console.log("To view the log in pretty format: iate what");
+  console.log("To print a CSV: iate csv");
   console.log("To reset the log: iate clear");
   console.log("To read this help message: iate help");
 };
 
-const readLog = () => {  
+const readLog = ({ pretty = false }) => {
   fs.readFile(filename, function(err, data) {
     if (err || data.length === 0) {
       console.log('No entries yet! Thank you.');
       return;
     }
 
-    console.log(data.toString());
+    if (!pretty) {
+      console.log(data.toString());
+      return;
+    }
+
+    const { data: parsedData } = csv.parse(data.toString())
+    const rows = parsedData.slice(1);
+    const sortedRows = rows.sort((a, b) => { a[0] - b[0] });
+    let output = "";
+
+    sortedRows.forEach((row) => {
+      output = output + row[1] + "\t" + row[2] + "\n";
+    });
+
+    console.log(output);
   });
 };
 
-const writeEntry = (text) => {
-  const data = { [fields[0]]: Date.now(), [fields[1]]: text.join(' ') };
+const writeEntry = (words) => {
+  let date;
+  const processedWords = [];
+
+  words.some((word, i) => {
+    let finished = false;
+
+    switch (word) {
+      case 'at': {
+        const dateWords = words.slice(i+1, i.length);
+        date = chrono.parseDate(dateWords.join(' '));
+        finished = true;
+        break;
+      }
+
+      default: {
+        processedWords.push(word);
+      }
+    }
+
+    return finished;
+  });
+
+  date = date || new Date();
+
+  const formattedDate = date.toLocaleDateString('en', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  });
+
+  const data = {
+    fields: ['UTS', 'Pretty Date', 'Description'],
+    data: [
+      date.getTime(),
+      formattedDate,
+      processedWords.join(' '),
+    ]
+  };
 
   fs.stat(filename, function (err, stat) {
     if (err || stat.size === 0) {
-      const csvEntry = json2csv([data]) + newline;
+      const csvEntry = csv.unparse(data);
       fs.writeFile(filename, csvEntry, _ack);
     } else {
-      const csvEntry = json2csv([data], { header: false }) + newline;
+      const csvEntry = csv.unparse(data);
       fs.appendFile(filename, csvEntry, _ack);
     }
   });
@@ -58,8 +114,10 @@ switch (firstWord) {
     printHelp();
     break;
   case 'what':
-  case 'read':
-    readLog();
+    readLog({ pretty: true });
+    break;
+  case 'csv':
+    readLog({ pretty: false });
     break;
   case 'clear':
     clearLog();
