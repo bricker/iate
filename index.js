@@ -32,7 +32,7 @@ const readLog = ({ pretty = false }) => {
 
     const { data: parsedData } = csv.parse(data.toString())
     const rows = parsedData.slice(1);
-    const sortedRows = rows.sort((a, b) => { a[0] - b[0] });
+    const sortedRows = rows.sort((a, b) => { return parseInt(a[0], 10) - parseInt(b[0], 10) });
     let output = "";
 
     sortedRows.forEach((row) => {
@@ -91,8 +91,8 @@ const writeEntry = (words) => {
       const csvEntry = csv.unparse(data);
       fs.writeFile(filename, csvEntry, _ack);
     } else {
-      const csvEntry = csv.unparse(data);
-      fs.appendFile(filename, csvEntry, _ack);
+      const csvEntry = csv.unparse(data, { header: false });
+      fs.appendFile(filename, '\r\n' + csvEntry, _ack);
     }
   });
 };
