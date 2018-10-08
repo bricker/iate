@@ -39,7 +39,7 @@ const readLog = ({ pretty = false }) => {
     }
 
     const { data: parsedData } = csv.parse(data.toString())
-    const rows = parsedData.slice(1);
+    const rows = parsedData.slice(1).filter((row) => { return row.join().trim().length > 0 });
     const sortedRows = rows.sort((a, b) => { return parseInt(a[0], 10) - parseInt(b[0], 10) });
     let output = "";
 
