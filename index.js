@@ -15,6 +15,8 @@ const printHelp = () => {
   console.log("To view the log in pretty format: iate what");
   console.log("To print a CSV: iate csv");
   console.log("To reset the log: iate clear");
+  console.log("To see the location of the raw log: iate where");
+  console.log("To edit the raw log: iate edit");
   console.log("To read this help message: iate help");
 };
 
@@ -121,6 +123,15 @@ switch (firstWord) {
     break;
   case 'clear':
     clearLog();
+    break;
+  case 'where':
+    console.log(filename);
+    break;
+  case 'edit':
+    require('child_process').spawn("vim", [filename], {
+      detached: true,
+      stdio: 'inherit',
+    });
     break;
   default:
     writeEntry(command);
