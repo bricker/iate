@@ -2,10 +2,16 @@
 
 const csv = require('papaparse');
 const fs = require('fs');
+const os = require('os');
 const chrono = require('chrono-node');
 
+const dir = os.homedir() + '/.iate';
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, '0744');
+}
+
 const newline = "\r\n";
-const filename = __dirname + '/iate.csv';
+const filename = dir + '/iate.csv';
 const [,, ...command] = process.argv;
 
 const printHelp = () => {
@@ -128,7 +134,7 @@ switch (firstWord) {
     console.log(filename);
     break;
   case 'edit':
-    require('child_process').spawn("vim", [filename], {
+    require('child_process').spawn(process.env.EDITOR || 'vim', [filename], {
       detached: true,
       stdio: 'inherit',
     });
